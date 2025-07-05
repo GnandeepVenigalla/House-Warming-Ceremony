@@ -26,9 +26,17 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.post('/rsvp', async (req, res) => {
-  const { name, attendance, adults, kids, contact, comment } = req.body;
+  let { name, attendance, adults, kids, contact, comment } = req.body;
   const adultsNum = attendance === 'yes' ? Number(adults) : 0;
   const kidsNum = attendance === 'yes' ? Number(kids) : 0;
+
+  // Sanitize comment to ensure it's a string
+  if (Array.isArray(comment)) {
+    comment = comment.join(', ');
+  } else if (typeof comment !== 'string') {
+    comment = '';
+  }
+
   try {
     await new RSVP({ name, attendance, adults: adultsNum, kids: kidsNum, contact, comment }).save();
     res.json({ success: true });
