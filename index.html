@@ -9,14 +9,13 @@
 </head>
 <body class="bg-gradient-to-b from-blue-100 to-white text-[#d9984a]">
   <header class="text-center p-4 text-[#b75f16]">
-    <h1 class="text-3xl font-bold">Kiran, Sravanthi & Ishanth's Housewarming Ceremony</h1>
-    <p class="text-lg mt-2">Join us in celebrating our new home!</p>
+    <h1 class="text-xl font-bold">Kiran, Sravanthi & Ishanth's Gruhapravesam Invitation</h1>
   </header>
   <div class="max-w-sm mx-auto p-4">
     <img src="public/images/Orange Cream and Peach Griha Pravesh Ceremony Invitation.png" alt="House Invite" class="rounded-lg shadow-lg w-full" />
      
     <div class="bg-rsvp-background bg-cover bg-center rounded-lg p-4 mt-3">
-    <form id="rsvp-form" action="/rsvp" method="POST" class="p-4">
+    <form id="rsvp-form" action="/rsvp" method="POST" class="p-4 mt-12">
       <h2 class="text-xl font-bold mb-4 text-center">RSVP</h2>
       <div class="mb-3 text-center display-grid">
         <label class="mr-4 font-semibold">Will you attend?</label>
@@ -35,6 +34,7 @@
         <input id="kids-input" name="kids" type="number" min="0" placeholder="Number of Kids" class="w-full border p-2 mb-3 rounded" />
       </div>
       <input name="contact" type="tel" required placeholder="Contact Number" class="w-full border p-2 mb-3 rounded" />
+      <textarea name="comment" placeholder="Additional comments (optional)" class="w-full border p-2 mb-3 rounded" rows="4"></textarea>
       <button type="submit" class="bg-[#b75f16] text-white w-full py-2 rounded hover:bg-amber-400">Submit RSVP</button>
     </form>
     <div id="thank-you-message" class="hidden p-4 mt-6 text-center text-lg font-semibold text-[#b75f16]"></div>

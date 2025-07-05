@@ -18,6 +18,7 @@ const RSVP = mongoose.model('RSVP', {
   adults: { type: Number, default: 0 },
   kids: { type: Number, default: 0 },
   contact: String,
+  comment: String,
 });
 
 app.use(cors());  // Enable CORS for all origins
@@ -25,11 +26,11 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.post('/rsvp', async (req, res) => {
-  const { name, attendance, adults, kids, contact } = req.body;
+  const { name, attendance, adults, kids, contact, comment } = req.body;
   const adultsNum = attendance === 'yes' ? Number(adults) : 0;
   const kidsNum = attendance === 'yes' ? Number(kids) : 0;
   try {
-    await new RSVP({ name, attendance, adults: adultsNum, kids: kidsNum, contact }).save();
+    await new RSVP({ name, attendance, adults: adultsNum, kids: kidsNum, contact, comment }).save();
     res.json({ success: true });
   } catch (error) {
     console.error('Error saving RSVP:', error);

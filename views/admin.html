@@ -84,7 +84,8 @@
               <p><strong>Attendance:</strong> ${entry.attendance}</p>
               <p><strong>Adults:</strong> ${entry.adults}</p>
               <p><strong>Kids:</strong> ${entry.kids}</p>
-              <p><strong>Contact:</strong> ${entry.contact}</p>
+            <p><strong>Contact:</strong> ${entry.contact}</p>
+            <p><strong>Comment:</strong> ${entry.comment ? entry.comment : 'N/A'}</p>
             `;
             list.appendChild(li);
           });
