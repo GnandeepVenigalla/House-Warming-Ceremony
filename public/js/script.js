@@ -50,7 +50,7 @@ rsvpForm.addEventListener("submit", async (e) => {
         const thankYouMessage = document.getElementById("thank-you-message");
         const attendance = form.querySelector('input[name="attendance"]:checked').value;
         if (attendance === "yes") {
-          thankYouMessage.innerHTML = "Thank you for your RSVP! <br/> We warmly welcome you to the Ceremony!";
+          thankYouMessage.innerHTML = "Thank you for your RSVP! <br/> Welcome to our new home — where the journey of beautiful memories begins.";
         } else {
           thankYouMessage.textContent = "Thank you for your RSVP!";
         }
