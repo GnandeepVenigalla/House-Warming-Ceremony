@@ -31,7 +31,7 @@ rsvpForm.addEventListener("submit", async (e) => {
   const formData = new URLSearchParams(new FormData(form));
 
   try {
-    const response = await fetch('http://localhost:3000/rsvp', {
+    const response = await fetch('https://house-warming-ceremony.onrender.com/rsvp', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',

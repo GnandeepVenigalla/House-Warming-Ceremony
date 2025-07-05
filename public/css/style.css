@@ -45,7 +45,7 @@ button {
 
 /* Added background image for RSVP form and Google map link container */
 .bg-rsvp-background {
-  background-image: url('/images/background-im.png');
+  background-image: url('../images/background-im.png');
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;

@@ -31,7 +31,7 @@
     async function fetchRSVPs() {
       try {
         console.log('Fetching RSVP data...');
-        const response = await fetch('/api/rsvps');
+        const response = await fetch('https://house-warming-ceremony.onrender.com/api/rsvps');
         console.log('Response status:', response.status);
         const data = await response.json();
         console.log('Fetched data:', data);
