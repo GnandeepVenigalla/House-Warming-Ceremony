@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>RSVP Responses</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 p-4">
+  <div class="max-w-lg mx-auto">
+    <h1 class="text-2xl font-bold mb-4">Admin - RSVP Responses</h1>
+    <div class="mb-4">
+      <p><strong>Total RSVPs:</strong> <span id="total-rsvps">0</span></p>
+      <p><strong>Total Adults:</strong> <span id="total-adults">0</span></p>
+      <p><strong>Total Kids:</strong> <span id="total-kids">0</span></p>
+      <p><strong>Total Yes RSVPs:</strong> <span id="total-yes">0</span></p>
+      <p><strong>Total No RSVPs:</strong> <span id="total-no">0</span></p>
+      <div class="mt-2">
+        <label for="filter-attendance" class="font-semibold mr-2">Filter by attendance:</label>
+        <select id="filter-attendance" class="border rounded p-1">
+          <option value="all">All</option>
+          <option value="yes">Yes</option>
+          <option value="no">No</option>
+        </select>
+      </div>
+    </div>
+    <ul id="rsvp-list" class="space-y-2">
+      <!-- RSVP entries will be dynamically inserted here -->
+    </ul>
+  </div>
+  <script>
+    async function fetchRSVPs() {
+      try {
+        console.log('Fetching RSVP data...');
+        const response = await fetch('/api/rsvps');
+        console.log('Response status:', response.status);
+        const data = await response.json();
+        console.log('Fetched data:', data);
+        const list = document.getElementById('rsvp-list');
+        const totalRsvpsElem = document.getElementById('total-rsvps');
+        const totalAdultsElem = document.getElementById('total-adults');
+        const totalKidsElem = document.getElementById('total-kids');
+        const totalYesElem = document.getElementById('total-yes');
+        const totalNoElem = document.getElementById('total-no');
+        const filterSelect = document.getElementById('filter-attendance');
+        list.innerHTML = '';
+        let totalAdults = 0;
+        let totalKids = 0;
+        let totalYes = 0;
+        let totalNo = 0;
+
+        function renderList(filteredData) {
+          list.innerHTML = '';
+          filteredData.forEach(entry => {
+            const li = document.createElement('li');
+            li.className = 'bg-white shadow p-3 rounded';
+            li.innerHTML = `
+              <p><strong>Name:</strong> ${entry.name}</p>
+              <p><strong>Attendance:</strong> ${entry.attendance}</p>
+              <p><strong>Adults:</strong> ${entry.adults}</p>
+              <p><strong>Kids:</strong> ${entry.kids}</p>
+              <p><strong>Contact:</strong> ${entry.contact}</p>
+            `;
+            list.appendChild(li);
+          });
+        }
+
+        data.forEach(entry => {
+          totalAdults += entry.adults;
+          totalKids += entry.kids;
+          if (entry.attendance === 'yes') totalYes++;
+          else if (entry.attendance === 'no') totalNo++;
+        });
+
+        totalRsvpsElem.textContent = data.length;
+        totalAdultsElem.textContent = totalAdults;
+        totalKidsElem.textContent = totalKids;
+        totalYesElem.textContent = totalYes;
+        totalNoElem.textContent = totalNo;
+
+        renderList(data);
+
+        filterSelect.addEventListener('change', () => {
+          const filterValue = filterSelect.value;
+          if (filterValue === 'all') {
+            renderList(data);
+          } else {
+            renderList(data.filter(entry => entry.attendance === filterValue));
+          }
+        });
+      } catch (error) {
+        console.error('Failed to fetch RSVP data:', error);
+      }
+    }
+    fetchRSVPs();
+  </script>
+</body>
+</html>

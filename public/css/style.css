@@ -1,0 +1,52 @@
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.container {
+  text-align: center;
+  position: relative;
+}
+#house-img {
+  max-width: 400px;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+}
+#house-img:hover {
+  transform: scale(1.05);
+}
+.invite {
+  position: absolute;
+  top: 10%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+  max-width: 90%;
+  width: 350px;
+}
+.hidden {
+  display: none;
+}
+input {
+  width: 90%;
+  margin: 10px 0;
+  padding: 8px;
+}
+button {
+  padding: 10px 20px;
+  background: #4caf50;
+  color: white;
+  border: none;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+/* Added background image for RSVP form and Google map link container */
+.bg-rsvp-background {
+  background-image: url('../images/background-im.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
