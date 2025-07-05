@@ -31,7 +31,10 @@ rsvpForm.addEventListener("submit", async (e) => {
   const formData = new URLSearchParams(new FormData(form));
 
   try {
-    // Include comment field in formData
+    // Remove any existing comment entries to avoid duplicates
+    formData.delete('comment');
+
+    // Include comment field in formData as a single string
     const comment = form.querySelector('textarea[name="comment"]').value;
     if (comment) {
       formData.append('comment', comment);
@@ -45,7 +48,6 @@ rsvpForm.addEventListener("submit", async (e) => {
       body: formData.toString(),
       redirect: 'follow'
     });
-
 
     console.log('Response status:', response.status);
     console.log('Response redirected:', response.redirected);
