@@ -29,8 +29,12 @@ rsvpForm.addEventListener("submit", async (e) => {
 
   const form = e.target;
   const formData = new URLSearchParams(new FormData(form));
+  const loadingSpinner = document.getElementById("loading-spinner");
 
   try {
+    // Show loading spinner
+    loadingSpinner.classList.remove("hidden");
+
     // Remove any existing comment entries to avoid duplicates
     formData.delete('comment');
 
@@ -48,6 +52,9 @@ rsvpForm.addEventListener("submit", async (e) => {
       body: formData.toString(),
       redirect: 'follow'
     });
+
+    // Hide loading spinner
+    loadingSpinner.classList.add("hidden");
 
     console.log('Response status:', response.status);
     console.log('Response redirected:', response.redirected);
@@ -73,6 +80,9 @@ rsvpForm.addEventListener("submit", async (e) => {
       alert('Failed to submit RSVP. Please try again.');
     }
   } catch (error) {
+    // Hide loading spinner on error
+    loadingSpinner.classList.add("hidden");
+
     alert('Error submitting RSVP. Please try again.');
     console.error('Error:', error);
   }

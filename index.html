@@ -36,6 +36,12 @@
       <input name="contact" type="tel" required placeholder="Contact Number" class="w-full border p-2 mb-3 rounded" />
       <textarea name="comment" placeholder="Additional comments (optional)" class="w-full border p-2 mb-3 rounded" rows="4"></textarea>
       <button type="submit" class="bg-[#b75f16] text-white w-full py-2 rounded hover:bg-amber-400">Submit RSVP</button>
+      <div id="loading-spinner" class="hidden mt-4 text-center">
+        <svg class="animate-spin h-6 w-6 text-[#b75f16] mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+        </svg>
+      </div>
     </form>
     <div id="thank-you-message" class="hidden p-4 mt-14 text-center text-lg font-semibold text-[#b75f16]"></div>
 
