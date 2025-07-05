@@ -9,18 +9,42 @@
   <div class="max-w-lg mx-auto">
     <h1 class="text-2xl font-bold mb-4">Admin - RSVP Responses</h1>
     <div class="mb-4">
-      <p><strong>Total RSVPs:</strong> <span id="total-rsvps">0</span></p>
-      <p><strong>Total Adults:</strong> <span id="total-adults">0</span></p>
-      <p><strong>Total Kids:</strong> <span id="total-kids">0</span></p>
-      <p><strong>Total Yes RSVPs:</strong> <span id="total-yes">0</span></p>
-      <p><strong>Total No RSVPs:</strong> <span id="total-no">0</span></p>
-      <div class="mt-2">
-        <label for="filter-attendance" class="font-semibold mr-2">Filter by attendance:</label>
-        <select id="filter-attendance" class="border rounded p-1">
-          <option value="all">All</option>
-          <option value="yes">Yes</option>
-          <option value="no">No</option>
-        </select>
+      <div class="grid grid-cols-3 gap-4 text-center bg-white p-4 rounded shadow">
+        <div>
+          <p class="text-lg font-semibold">Total RSVPs</p>
+          <p id="total-rsvps" class="text-2xl font-bold">0</p>
+        </div>
+        <div>
+          <p class="text-lg font-semibold">Total Adults</p>
+          <p id="total-adults" class="text-2xl font-bold">0</p>
+        </div>
+        <div>
+          <p class="text-lg font-semibold">Total Kids</p>
+          <p id="total-kids" class="text-2xl font-bold">0</p>
+        </div>
+        <div>
+          <p class="text-lg font-semibold">Total Yes RSVPs</p>
+          <p id="total-yes" class="text-2xl font-bold">0</p>
+        </div>
+        <div>
+          <p class="text-lg font-semibold">Total No RSVPs</p>
+          <p id="total-no" class="text-2xl font-bold">0</p>
+        </div>
+      </div>
+      <div class="mt-4 flex items-center space-x-4">
+        <div>
+          <label for="search-name" class="font-semibold mr-2">Search by name:</label>
+          <input type="text" id="search-name" class="border rounded p-1" placeholder="Enter name" />
+          <button id="search-button" class="ml-2 bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600">Search</button>
+        </div>
+        <div>
+          <label for="filter-attendance" class="font-semibold mr-2">Filter by attendance:</label>
+          <select id="filter-attendance" class="border rounded p-1">
+            <option value="all">All</option>
+            <option value="yes">Yes</option>
+            <option value="no">No</option>
+          </select>
+        </div>
       </div>
     </div>
     <ul id="rsvp-list" class="space-y-2">
@@ -42,6 +66,8 @@
         const totalYesElem = document.getElementById('total-yes');
         const totalNoElem = document.getElementById('total-no');
         const filterSelect = document.getElementById('filter-attendance');
+        const searchInput = document.getElementById('search-name');
+        const searchButton = document.getElementById('search-button');
         list.innerHTML = '';
         let totalAdults = 0;
         let totalKids = 0;
@@ -77,16 +103,27 @@
         totalYesElem.textContent = totalYes;
         totalNoElem.textContent = totalNo;
 
-        renderList(data);
-
-        filterSelect.addEventListener('change', () => {
+        function filterAndRender() {
           const filterValue = filterSelect.value;
-          if (filterValue === 'all') {
-            renderList(data);
-          } else {
-            renderList(data.filter(entry => entry.attendance === filterValue));
+          const searchValue = searchInput.value.trim().toLowerCase();
+
+          let filteredData = data;
+
+          if (filterValue !== 'all') {
+            filteredData = filteredData.filter(entry => entry.attendance === filterValue);
           }
-        });
+
+          if (searchValue !== '') {
+            filteredData = filteredData.filter(entry => entry.name.toLowerCase().includes(searchValue));
+          }
+
+          renderList(filteredData);
+        }
+
+        filterSelect.addEventListener('change', filterAndRender);
+        searchButton.addEventListener('click', filterAndRender);
+
+        renderList(data);
       } catch (error) {
         console.error('Failed to fetch RSVP data:', error);
       }
