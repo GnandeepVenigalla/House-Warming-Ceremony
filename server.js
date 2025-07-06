@@ -65,6 +65,41 @@ app.get('/api/rsvps', async (req, res) => {
   }
 });
 
+// DELETE RSVP by ID
+app.delete('/rsvp/:id', async (req, res) => {
+  try {
+    const result = await RSVP.findByIdAndDelete(req.params.id);
+    if (result) {
+      res.json({ success: true });
+    } else {
+      res.status(404).json({ success: false, error: 'RSVP not found' });
+    }
+  } catch (error) {
+    console.error('Error deleting RSVP:', error);
+    res.status(500).json({ success: false, error: 'Failed to delete RSVP' });
+  }
+});
+
+// UPDATE RSVP by ID
+app.put('/rsvp/:id', async (req, res) => {
+  try {
+    const updateData = req.body;
+    if (updateData.adults) updateData.adults = Number(updateData.adults);
+    if (updateData.kids) updateData.kids = Number(updateData.kids);
+    const updated = await RSVP.findByIdAndUpdate(req.params.id, updateData, { new: true });
+    if (updated) {
+      res.json({ success: true, data: updated });
+    } else {
+      res.status(404).json({ success: false, error: 'RSVP not found' });
+    }
+  } catch (error) {
+    console.error('Error updating RSVP:', error);
+    res.status(500).json({ success: false, error: 'Failed to update RSVP' });
+  }
+});
+
+
+
 app.listen(3000, () => {
   console.log('🚀 Server running at http://localhost:3000');
 });
