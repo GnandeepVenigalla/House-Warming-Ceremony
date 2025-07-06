@@ -13,7 +13,8 @@ mongoose.connect(mongoUri)
 .catch((err) => console.error('❌ MongoDB connection error:', err));
 
 const RSVP = mongoose.model('RSVP', {
-  name: String,
+  firstName: String,
+  lastName: String,
   attendance: { type: String, enum: ['yes', 'no'], required: true },
   adults: { type: Number, default: 0 },
   kids: { type: Number, default: 0 },
@@ -26,7 +27,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.post('/rsvp', async (req, res) => {
-  let { name, attendance, adults, kids, contact, comment } = req.body;
+  let { firstName, lastName, attendance, adults, kids, contact, comment } = req.body;
   const adultsNum = attendance === 'yes' ? Number(adults) : 0;
   const kidsNum = attendance === 'yes' ? Number(kids) : 0;
 
@@ -38,7 +39,7 @@ app.post('/rsvp', async (req, res) => {
   }
 
   try {
-    await new RSVP({ name, attendance, adults: adultsNum, kids: kidsNum, contact, comment }).save();
+    await new RSVP({ firstName, lastName, attendance, adults: adultsNum, kids: kidsNum, contact, comment }).save();
     res.json({ success: true });
   } catch (error) {
     console.error('Error saving RSVP:', error);
@@ -62,6 +63,25 @@ app.get('/api/rsvps', async (req, res) => {
     res.send(JSON.stringify(data));
   } catch (error) {
     res.status(500).json({ error: 'Failed to fetch RSVP data' });
+  }
+});
+
+// New API endpoint to check RSVP by firstName and lastName
+app.get('/rsvp/check', async (req, res) => {
+  const { firstName, lastName } = req.query;
+  if (!firstName || !lastName) {
+    return res.status(400).json({ success: false, error: 'Missing firstName or lastName' });
+  }
+  try {
+    const rsvp = await RSVP.findOne({ firstName: firstName, lastName: lastName });
+    if (rsvp) {
+      res.json({ success: true, data: rsvp });
+    } else {
+      res.json({ success: false, data: null });
+    }
+  } catch (error) {
+    console.error('Error checking RSVP:', error);
+    res.status(500).json({ success: false, error: 'Failed to check RSVP' });
   }
 });
 

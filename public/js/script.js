@@ -10,16 +10,19 @@ const kidsInput = document.getElementById("kids-input");
 
 document.querySelectorAll('input[name="attendance"]').forEach((elem) => {
   elem.addEventListener("change", (event) => {
+    const mapContainer = document.getElementById("map-container");
     if (event.target.value === "yes") {
       attendeesInput.classList.remove("hidden");
       adultsInput.setAttribute("required", "required");
       kidsInput.setAttribute("required", "required");
+      mapContainer.classList.remove("hidden");
     } else {
       attendeesInput.classList.add("hidden");
       adultsInput.removeAttribute("required");
       kidsInput.removeAttribute("required");
       adultsInput.value = "";
       kidsInput.value = "";
+      mapContainer.classList.add("hidden");
     }
   });
 });
@@ -42,6 +45,25 @@ rsvpForm.addEventListener("submit", async (e) => {
     const comment = form.querySelector('textarea[name="comment"]').value;
     if (comment) {
       formData.append('comment', comment);
+    }
+
+    // Check if RSVP exists for firstName and lastName
+    const firstName = form.querySelector('input[name="firstName"]').value.trim();
+    const lastName = form.querySelector('input[name="lastName"]').value.trim();
+
+    const checkResponse = await fetch(`https://house-warming-ceremony.onrender.com/rsvp/check?firstName=${encodeURIComponent(firstName)}&lastName=${encodeURIComponent(lastName)}`);
+    const checkData = await checkResponse.json();
+
+    if (checkData.success && checkData.data) {
+      // RSVP exists, show message with contact and show map
+      loadingSpinner.classList.add("hidden");
+      form.classList.add("hidden");
+      const thankYouMessage = document.getElementById("thank-you-message");
+      thankYouMessage.innerHTML = `You have already submitted the request for edit of RSVP contact ${checkData.data.contact}`;
+      thankYouMessage.classList.remove("hidden");
+      const mapContainer = document.getElementById("map-container");
+      mapContainer.classList.remove("hidden");
+      return;
     }
 
     const response = await fetch('https://house-warming-ceremony.onrender.com/rsvp', {
