@@ -59,10 +59,11 @@ rsvpForm.addEventListener("submit", async (e) => {
       loadingSpinner.classList.add("hidden");
       form.classList.add("hidden");
       const thankYouMessage = document.getElementById("thank-you-message");
-      thankYouMessage.innerHTML = `You have already submitted the request for edit of RSVP contact ${checkData.data.contact}`;
+      thankYouMessage.innerHTML = `You have already submitted the request for edit of RSVP contact 609-210-3151`;
       thankYouMessage.classList.remove("hidden");
       const mapContainer = document.getElementById("map-container");
       mapContainer.classList.remove("hidden");
+      
       return;
     }
 

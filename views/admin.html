@@ -4,199 +4,160 @@
   <meta charset="UTF-8" />
   <title>RSVP Responses</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ag-grid-community/styles/ag-grid.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ag-grid-community/styles/ag-theme-alpine.css" />
+  <script src="https://cdn.jsdelivr.net/npm/ag-grid-community/dist/ag-grid-community.noStyle.js"></script>
 </head>
 <body class="bg-gray-100 p-4">
   <div>
     <h1 class="text-2xl font-bold mb-4">Admin - RSVP Responses</h1>
-    <div class="mb-4">
-      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-center bg-white p-4 rounded shadow">
-        <div>
-          <p class="text-lg font-semibold">Total RSVPs</p>
-          <p id="total-rsvps" class="text-2xl font-bold">0</p>
-        </div>
-        <div>
-          <p class="text-lg font-semibold">Total Adults</p>
-          <p id="total-adults" class="text-2xl font-bold">0</p>
-        </div>
-        <div>
-          <p class="text-lg font-semibold">Total Kids</p>
-          <p id="total-kids" class="text-2xl font-bold">0</p>
-        </div>
-        <div>
-          <p class="text-lg font-semibold">Total Yes RSVPs</p>
-          <p id="total-yes" class="text-2xl font-bold">0</p>
-        </div>
-        <div>
-          <p class="text-lg font-semibold">Total No RSVPs</p>
-          <p id="total-no" class="text-2xl font-bold">0</p>
-        </div>
+    <div class="mb-4 flex flex-nowrap justify-between items-center gap-2 flex-wrap md:flex-nowrap">
+      <div class="flex gap-2 flex-shrink-0">
+        <button id="save-button" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 whitespace-nowrap">Save Changes</button>
+        <button id="download-button" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 whitespace-nowrap">Download CSV</button>
       </div>
-      <div class="mt-4 flex items-center space-x-4">
-        <div>
-          <label for="search-name" class="font-semibold mr-2">Search by name:</label>
-          <input type="text" id="search-name" class="border rounded p-1" placeholder="Enter name" />
-          <button id="search-button" class="ml-2 bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600">Search</button>
-        </div>
-        <div>
-          <label for="filter-attendance" class="font-semibold mr-2">Filter by attendance:</label>
-          <select id="filter-attendance" class="border rounded p-1">
-            <option value="all">All</option>
-            <option value="yes">Yes</option>
-            <option value="no">No</option>
-          </select>
-        </div>
+      <div class="flex flex-grow gap-4 items-center min-w-0">
+        <input type="text" id="search-name" class="border rounded p-1 flex-grow min-w-0 max-w-xs md:max-w-md" placeholder="Search by name" />
+        <select id="filter-attendance" class="border rounded p-1 flex-shrink-0">
+          <option value="all">All</option>
+          <option value="yes">Yes</option>
+          <option value="no">No</option>
+        </select>
       </div>
     </div>
-    <ul id="rsvp-list" class="space-y-2">
-      <!-- RSVP entries will be dynamically inserted here -->
-    </ul>
+    <div id="myGrid" class="ag-theme-alpine" style="height: 400px; width: 100%; max-width: 100vw;"></div>
   </div>
   <script>
-    async function fetchRSVPs() {
-      try {
-        console.log('Fetching RSVP data...');
-        const response = await fetch('https://house-warming-ceremony.onrender.com/api/rsvps');
-        console.log('Response status:', response.status);
-        const data = await response.json();
-        console.log('Fetched data:', data);
-        const list = document.getElementById('rsvp-list');
-        const totalRsvpsElem = document.getElementById('total-rsvps');
-        const totalAdultsElem = document.getElementById('total-adults');
-        const totalKidsElem = document.getElementById('total-kids');
-        const totalYesElem = document.getElementById('total-yes');
-        const totalNoElem = document.getElementById('total-no');
-        const filterSelect = document.getElementById('filter-attendance');
-        const searchInput = document.getElementById('search-name');
-        const searchButton = document.getElementById('search-button');
-        list.innerHTML = '';
-        let totalAdults = 0;
-        let totalKids = 0;
-        let totalYes = 0;
-        let totalNo = 0;
-
-        function renderList(filteredData) {
-          list.innerHTML = '';
-          filteredData.forEach(entry => {
-            const li = document.createElement('li');
-            li.className = 'bg-white shadow p-3 rounded';
-            li.innerHTML = `
-              <p><strong>Name:</strong> ${entry.name}</p>
-              <p><strong>Attendance:</strong> ${entry.attendance}</p>
-              <p><strong>Adults:</strong> ${entry.adults}</p>
-              <p><strong>Kids:</strong> ${entry.kids}</p>
-              <p><strong>Contact:</strong> ${entry.contact}</p>
-              <p><strong>Comment:</strong> ${entry.comment ? entry.comment : 'N/A'}</p>
-              <div class="mt-2 space-x-2">
-                <button class="delete-btn bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600" data-id="${entry._id}">Delete</button>
-                <button class="edit-btn bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600" data-id="${entry._id}">Edit</button>
-              </div>
-            `;
-            list.appendChild(li);
-          });
+    document.addEventListener('DOMContentLoaded', function () {
+      const gridOptions = {
+        columnDefs: [
+          { headerName: "First Name", field: "firstName", editable: true, filter: 'agTextColumnFilter' },
+          { headerName: "Last Name", field: "lastName", editable: true, filter: 'agTextColumnFilter' },
+          { headerName: "Attendance", field: "attendance", editable: true, filter: 'agSetColumnFilter', cellEditor: 'agSelectCellEditor', cellEditorParams: { values: ['yes', 'no'] } },
+          { headerName: "Adults", field: "adults", editable: true, filter: 'agNumberColumnFilter', type: 'numericColumn' },
+          { headerName: "Kids", field: "kids", editable: true, filter: 'agNumberColumnFilter', type: 'numericColumn' },
+          { headerName: "Contact", field: "contact", editable: true, filter: 'agTextColumnFilter' },
+          { headerName: "Comment", field: "comment", editable: true, filter: 'agTextColumnFilter' },
+          { headerName: "Actions", field: "_id", cellRenderer: function(params) {
+              return `<button class="delete-btn bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600" data-id="${params.value}">Delete</button>`;
+            }
+          }
+        ],
+        defaultColDef: {
+          sortable: true,
+          resizable: true,
+          flex: 1,
+          minWidth: 100,
+        },
+        rowData: null,
+        animateRows: true,
+        onCellValueChanged: function(event) {
+          // Optionally handle cell value changes here
         }
+      };
 
-        data.forEach(entry => {
-          totalAdults += entry.adults;
-          totalKids += entry.kids;
-          if (entry.attendance === 'yes') totalYes++;
-          else if (entry.attendance === 'no') totalNo++;
+      const eGridDiv = document.querySelector('#myGrid');
+      new agGrid.Grid(eGridDiv, gridOptions);
+
+      eGridDiv.style.width = '100%';
+      eGridDiv.style.maxWidth = '100vw';
+
+      gridOptions.onGridReady = function(params) {
+        params.api.sizeColumnsToFit();
+      };
+
+      async function fetchRSVPs() {
+        try {
+          console.log('Fetching RSVP data...');
+          const response = await fetch('https://house-warming-ceremony.onrender.com/api/rsvps');
+          if (!response.ok) {
+            console.error('Failed to fetch RSVP data: HTTP status', response.status);
+            return;
+          }
+          const data = await response.json();
+          console.log('RSVP data received:', data);
+          if (!data || data.length === 0) {
+            console.warn('No RSVP data available to display.');
+          }
+          gridOptions.api.setRowData(data);
+          gridOptions.api.sizeColumnsToFit();
+        } catch (error) {
+          console.error('Failed to fetch RSVP data:', error);
+        }
+      }
+
+      fetchRSVPs();
+
+      // Save button handler
+      document.getElementById('save-button').addEventListener('click', async () => {
+        const updatedRows = [];
+        gridOptions.api.forEachNode(node => {
+          if (node.data && node.data._id) {
+            updatedRows.push(node.data);
+          }
         });
 
-        totalRsvpsElem.textContent = data.length;
-        totalAdultsElem.textContent = totalAdults;
-        totalKidsElem.textContent = totalKids;
-        totalYesElem.textContent = totalYes;
-        totalNoElem.textContent = totalNo;
-
-        function filterAndRender() {
-          const filterValue = filterSelect.value;
-          const searchValue = searchInput.value.trim().toLowerCase();
-
-          let filteredData = data;
-
-          if (filterValue !== 'all') {
-            filteredData = filteredData.filter(entry => entry.attendance === filterValue);
-          }
-
-          if (searchValue !== '') {
-            filteredData = filteredData.filter(entry => entry.name.toLowerCase().includes(searchValue));
-          }
-
-          renderList(filteredData);
-        }
-
-        filterSelect.addEventListener('change', filterAndRender);
-        searchButton.addEventListener('click', filterAndRender);
-
-        renderList(data);
-      } catch (error) {
-        console.error('Failed to fetch RSVP data:', error);
-      }
-    }
-    fetchRSVPs();
-
-    // Add event delegation for delete and edit buttons
-    document.getElementById('rsvp-list').addEventListener('click', async (event) => {
-      if (event.target.classList.contains('delete-btn')) {
-        const id = event.target.getAttribute('data-id');
-        if (confirm('Are you sure you want to delete this RSVP?')) {
+        for (const row of updatedRows) {
           try {
-            const response = await fetch(`https://house-warming-ceremony.onrender.com/rsvp/${id}`, {
-              method: 'DELETE',
+            const response = await fetch(`https://house-warming-ceremony.onrender.com/rsvp/${row._id}`, {
+              method: 'PUT',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(row),
             });
-            if (response.ok) {
-              alert('RSVP deleted successfully.');
-              fetchRSVPs();
-            } else {
-              alert('Failed to delete RSVP.');
+            if (!response.ok) {
+              alert(`Failed to update RSVP for ${row.firstName} ${row.lastName}`);
             }
           } catch (error) {
-            alert('Error deleting RSVP.');
+            alert(`Error updating RSVP for ${row.firstName} ${row.lastName}`);
             console.error(error);
           }
         }
-      } else if (event.target.classList.contains('edit-btn')) {
-        const id = event.target.getAttribute('data-id');
-        // For simplicity, prompt for new values (could be replaced with a modal form)
-        const newName = prompt('Enter new name:');
-        if (newName === null) return; // Cancelled
-        const newAttendance = prompt('Enter attendance (yes/no):');
-        if (newAttendance === null) return;
-        const newAdults = prompt('Enter number of adults:');
-        if (newAdults === null) return;
-        const newKids = prompt('Enter number of kids:');
-        if (newKids === null) return;
-        const newContact = prompt('Enter contact:');
-        if (newContact === null) return;
-        const newComment = prompt('Enter comment:');
-        if (newComment === null) return;
+        alert('All changes saved.');
+        fetchRSVPs();
+      });
 
-        try {
-          const response = await fetch(`https://house-warming-ceremony.onrender.com/rsvp/${id}`, {
-            method: 'PUT',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              name: newName,
-              attendance: newAttendance,
-              adults: Number(newAdults),
-              kids: Number(newKids),
-              contact: newContact,
-              comment: newComment,
-            }),
-          });
-          if (response.ok) {
-            alert('RSVP updated successfully.');
-            fetchRSVPs();
-          } else {
-            alert('Failed to update RSVP.');
+      // Delete button handler using event delegation
+      eGridDiv.addEventListener('click', async (event) => {
+        if (event.target.classList.contains('delete-btn')) {
+          const id = event.target.getAttribute('data-id');
+          if (confirm('Are you sure you want to delete this RSVP?')) {
+            try {
+              const response = await fetch(`https://house-warming-ceremony.onrender.com/rsvp/${id}`, {
+                method: 'DELETE',
+              });
+              if (response.ok) {
+                alert('RSVP deleted successfully.');
+                fetchRSVPs();
+              } else {
+                alert('Failed to delete RSVP.');
+              }
+            } catch (error) {
+              alert('Error deleting RSVP.');
+              console.error(error);
+            }
           }
-        } catch (error) {
-          alert('Error updating RSVP.');
-          console.error(error);
+        }
+      });
+
+      // Search and filter
+      const searchInput = document.getElementById('search-name');
+      const filterSelect = document.getElementById('filter-attendance');
+
+      function filterGrid() {
+        const searchValue = searchInput.value.toLowerCase();
+        const filterValue = filterSelect.value;
+
+        gridOptions.api.setQuickFilter(searchValue);
+
+        if (filterValue === 'all') {
+          gridOptions.api.setFilterModel(null);
+        } else {
+          gridOptions.api.setFilterModel({ attendance: { type: 'equals', filter: filterValue } });
         }
       }
+
+      searchInput.addEventListener('input', filterGrid);
+      filterSelect.addEventListener('change', filterGrid);
     });
   </script>
 </body>
