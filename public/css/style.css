@@ -52,3 +52,72 @@ button {
   color: #b75f16;
 }
 
+/* 1) Container sits on top of everything */
+.door-container {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  perspective: 1200px;
+  background: #f5f5dc; /* match page bg */
+  overflow: hidden;
+}
+
+/* 2) Prepare the panels */
+.door {
+  position: absolute;
+  top:   0;
+  bottom:0;
+  width: 50vw;    /* half the viewport width */
+  height:100vh;   /* full viewport height */
+  /* DOUBLE the image width, keep full height */
+  background-image: url('../pubilc/images/door-image.png');
+  background-size: 200% 100%;
+  background-repeat: no-repeat;
+  transition: transform 1s ease-in-out;
+}
+
+/* 3) Left half shows the left side of the doubled image */
+.door-left {
+  left: 0;
+  background-position:   0% 0;
+  transform-origin: left center;
+}
+
+/* 4) Right half shows the right side of the doubled image */
+.door-right {
+  right: 0;
+  background-position: 100% 0;
+  transform-origin: right center;
+}
+
+/* 5) Swing them open on `.open` */
+.door-container.open .door-left  { transform: rotateY(-90deg); }
+.door-container.open .door-right { transform: rotateY( 90deg); }
+
+/* 6) Welcome title — fade out when `.open` */
+#welcome-title {
+  position: absolute;
+  top:   40%;
+  width: 100%;
+  text-align: center;
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #b75f16;
+  z-index: 60;
+  transition: opacity 0.5s ease;
+}
+.door-container.open #welcome-title {
+  opacity: 0;
+}
+
+/* 7) Key button in front */
+#key-btn {
+  position: absolute;
+  bottom: 10%;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 3rem;
+  background: none;
+  border: none;
+  z-index: 60;
+}
