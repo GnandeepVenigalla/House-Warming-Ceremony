@@ -1,164 +1,243 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>RSVP Responses</title>
+  <meta charset="UTF-8"/>
+  <title>Admin – RSVP Responses</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+
+  <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ag-grid-community/styles/ag-grid.css" />
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ag-grid-community/styles/ag-theme-alpine.css" />
-  <script src="https://cdn.jsdelivr.net/npm/ag-grid-community/dist/ag-grid-community.noStyle.js"></script>
 </head>
+
 <body class="bg-gray-100 p-4">
-  <div>
-    <h1 class="text-2xl font-bold mb-4">Admin - RSVP Responses</h1>
-    <div class="mb-4 flex flex-nowrap justify-between items-center gap-2 flex-wrap md:flex-nowrap">
-      <div class="flex gap-2 flex-shrink-0">
-        <button id="save-button" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 whitespace-nowrap">Save Changes</button>
-        <button id="download-button" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 whitespace-nowrap">Download CSV</button>
+  <div class="max-w-6xl mx-auto space-y-6">
+    <h1 class="text-2xl font-bold">Admin – RSVP Responses</h1>
+
+    <!-- Summary Stats -->
+    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 bg-white p-4 rounded shadow">
+      <div class="text-center">
+        <p class="font-semibold">Total RSVPs</p>
+        <p id="total-rsvps" class="text-2xl font-bold">0</p>
       </div>
-      <div class="flex flex-grow gap-4 items-center min-w-0">
-        <input type="text" id="search-name" class="border rounded p-1 flex-grow min-w-0 max-w-xs md:max-w-md" placeholder="Search by name" />
-        <select id="filter-attendance" class="border rounded p-1 flex-shrink-0">
+      <div class="text-center">
+        <p class="font-semibold">Total Adults</p>
+        <p id="total-adults" class="text-2xl font-bold">0</p>
+      </div>
+      <div class="text-center">
+        <p class="font-semibold">Total Kids</p>
+        <p id="total-kids" class="text-2xl font-bold">0</p>
+      </div>
+      <div class="text-center">
+        <p class="font-semibold">Total Yes RSVPs</p>
+        <p id="total-yes" class="text-2xl font-bold">0</p>
+      </div>
+      <div class="text-center">
+        <p class="font-semibold">Total No RSVPs</p>
+        <p id="total-no" class="text-2xl font-bold">0</p>
+      </div>
+    </div>
+
+    <!-- Toolbar -->
+    <div class="space-y-2">
+      <div class="flex gap-2 items-center min-w-0">
+        <input id="search-input" type="text" placeholder="Search by name"
+               class="border rounded p-2 flex-grow min-w-0 max-w-full"/>
+        <select id="attendance-filter" class="border rounded p-2 min-w-[80px]">
           <option value="all">All</option>
           <option value="yes">Yes</option>
           <option value="no">No</option>
         </select>
       </div>
+      <div class="flex flex-nowrap items-center gap-2 flex-wrap md:flex-nowrap">
+        <div class="flex space-x-2 flex-shrink-0">
+          <button id="save-btn" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 whitespace-nowrap">
+            Save Changes
+          </button>
+          <button id="delete-selected-btn" class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 whitespace-nowrap">
+            Delete Selected
+          </button>
+          <button id="download-csv-btn" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 whitespace-nowrap min-w-[90px]">
+            Download CSV
+          </button>
+        </div>
+      </div>
     </div>
-    <div id="myGrid" class="ag-theme-alpine" style="height: 400px; width: 100%; max-width: 100vw;"></div>
+
+    <!-- Table -->
+    <div class="overflow-x-auto bg-white rounded shadow">
+      <table id="rsvp-table" class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-gray-50">
+          <tr>
+            <th class="p-2"><input type="checkbox" id="select-all"/></th>
+            <th class="p-2">First Name</th>
+            <th class="p-2">Last Name</th>
+            <th class="p-2">Attendance</th>
+            <th class="p-2">Adults</th>
+            <th class="p-2">Kids</th>
+            <th class="p-2">Contact</th>
+            <th class="p-2">Comment</th>
+            <th class="p-2">Actions</th>
+          </tr>
+        </thead>
+        <tbody id="rsvp-body" class="divide-y divide-gray-100">
+          <!-- rows injected here -->
+        </tbody>
+      </table>
+    </div>
   </div>
+
   <script>
-    document.addEventListener('DOMContentLoaded', function () {
-      const gridOptions = {
-        columnDefs: [
-          { headerName: "First Name", field: "firstName", editable: true, filter: 'agTextColumnFilter' },
-          { headerName: "Last Name", field: "lastName", editable: true, filter: 'agTextColumnFilter' },
-          { headerName: "Attendance", field: "attendance", editable: true, filter: 'agSetColumnFilter', cellEditor: 'agSelectCellEditor', cellEditorParams: { values: ['yes', 'no'] } },
-          { headerName: "Adults", field: "adults", editable: true, filter: 'agNumberColumnFilter', type: 'numericColumn' },
-          { headerName: "Kids", field: "kids", editable: true, filter: 'agNumberColumnFilter', type: 'numericColumn' },
-          { headerName: "Contact", field: "contact", editable: true, filter: 'agTextColumnFilter' },
-          { headerName: "Comment", field: "comment", editable: true, filter: 'agTextColumnFilter' },
-          { headerName: "Actions", field: "_id", cellRenderer: function(params) {
-              return `<button class="delete-btn bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600" data-id="${params.value}">Delete</button>`;
-            }
-          }
-        ],
-        defaultColDef: {
-          sortable: true,
-          resizable: true,
-          flex: 1,
-          minWidth: 100,
-        },
-        rowData: null,
-        animateRows: true,
-        onCellValueChanged: function(event) {
-          // Optionally handle cell value changes here
-        }
-      };
+  (() => {
+    const API_BASE = 'https://house-warming-ceremony.onrender.com';
+    let rsvps = [];
 
-      const eGridDiv = document.querySelector('#myGrid');
-      new agGrid.Grid(eGridDiv, gridOptions);
+    // Elements
+    const tbody       = document.getElementById('rsvp-body');
+    const stats       = {
+      total:  document.getElementById('total-rsvps'),
+      adults: document.getElementById('total-adults'),
+      kids:   document.getElementById('total-kids'),
+      yes:    document.getElementById('total-yes'),
+      no:     document.getElementById('total-no')
+    };
+    const inputs = {
+      search:   document.getElementById('search-input'),
+      filter:   document.getElementById('attendance-filter'),
+      selectAll:document.getElementById('select-all')
+    };
+    const btns = {
+      save:   document.getElementById('save-btn'),
+      deleteSel: document.getElementById('delete-selected-btn'),
+      download:  document.getElementById('download-csv-btn')
+    };
 
-      eGridDiv.style.width = '100%';
-      eGridDiv.style.maxWidth = '100vw';
+    // Fetch & render
+    async function load() {
+      const resp = await fetch(`${API_BASE}/api/rsvps`);
+      rsvps = await resp.json();
+      renderTable();
+      updateStats();
+    }
 
-      gridOptions.onGridReady = function(params) {
-        params.api.sizeColumnsToFit();
-      };
+    // Render table rows
+    function renderTable() {
+      const searchVal = inputs.search.value.toLowerCase();
+      const filterVal = inputs.filter.value;
 
-      async function fetchRSVPs() {
-        try {
-          console.log('Fetching RSVP data...');
-          const response = await fetch('https://house-warming-ceremony.onrender.com/api/rsvps');
-          if (!response.ok) {
-            console.error('Failed to fetch RSVP data: HTTP status', response.status);
-            return;
-          }
-          const data = await response.json();
-          console.log('RSVP data received:', data);
-          if (!data || data.length === 0) {
-            console.warn('No RSVP data available to display.');
-          }
-          gridOptions.api.setRowData(data);
-          gridOptions.api.sizeColumnsToFit();
-        } catch (error) {
-          console.error('Failed to fetch RSVP data:', error);
-        }
-      }
+      tbody.innerHTML = '';
+      rsvps.forEach(r => {
+        if ((r.firstName+' '+r.lastName).toLowerCase().indexOf(searchVal) === -1) return;
+        if (filterVal!=='all' && r.attendance !== filterVal) return;
 
-      fetchRSVPs();
-
-      // Save button handler
-      document.getElementById('save-button').addEventListener('click', async () => {
-        const updatedRows = [];
-        gridOptions.api.forEachNode(node => {
-          if (node.data && node.data._id) {
-            updatedRows.push(node.data);
-          }
-        });
-
-        for (const row of updatedRows) {
-          try {
-            const response = await fetch(`https://house-warming-ceremony.onrender.com/rsvp/${row._id}`, {
-              method: 'PUT',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify(row),
-            });
-            if (!response.ok) {
-              alert(`Failed to update RSVP for ${row.firstName} ${row.lastName}`);
-            }
-          } catch (error) {
-            alert(`Error updating RSVP for ${row.firstName} ${row.lastName}`);
-            console.error(error);
-          }
-        }
-        alert('All changes saved.');
-        fetchRSVPs();
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td class="p-2 text-center">
+            <input type="checkbox" class="row-checkbox" data-id="${r._id}"/>
+          </td>
+          ${['firstName','lastName','attendance','adults','kids','contact','comment']
+            .map(field => `
+              <td class="p-2" contenteditable>${r[field] ?? ''}</td>`).join('')}
+          <td class="p-2 text-center">
+            <button data-id="${r._id}" class="delete-btn text-red-600 hover:underline">Delete</button>
+          </td>
+        `;
+        tbody.appendChild(tr);
       });
+    }
 
-      // Delete button handler using event delegation
-      eGridDiv.addEventListener('click', async (event) => {
-        if (event.target.classList.contains('delete-btn')) {
-          const id = event.target.getAttribute('data-id');
-          if (confirm('Are you sure you want to delete this RSVP?')) {
-            try {
-              const response = await fetch(`https://house-warming-ceremony.onrender.com/rsvp/${id}`, {
-                method: 'DELETE',
-              });
-              if (response.ok) {
-                alert('RSVP deleted successfully.');
-                fetchRSVPs();
-              } else {
-                alert('Failed to delete RSVP.');
-              }
-            } catch (error) {
-              alert('Error deleting RSVP.');
-              console.error(error);
-            }
-          }
-        }
+    // Update summary stats
+    function updateStats() {
+      stats.total.innerText  = rsvps.length;
+      stats.adults.innerText = rsvps.reduce((s,r)=> s + (+r.adults||0), 0);
+      stats.kids.innerText   = rsvps.reduce((s,r)=> s + (+r.kids||0),   0);
+      stats.yes.innerText    = rsvps.filter(r=>r.attendance==='yes').length;
+      stats.no.innerText     = rsvps.filter(r=>r.attendance==='no').length;
+    }
+
+    // Read table back into rsvps[]
+    function syncFromTable() {
+      const rows = Array.from(tbody.querySelectorAll('tr'));
+      rsvps = rows.map(tr => {
+        const cells = Array.from(tr.children);
+        const id = cells[0].querySelector('input').dataset.id;
+        return {
+          _id: id,
+          firstName: cells[1].innerText.trim(),
+          lastName:  cells[2].innerText.trim(),
+          attendance:cells[3].innerText.trim(),
+          adults:    cells[4].innerText.trim(),
+          kids:      cells[5].innerText.trim(),
+          contact:   cells[6].innerText.trim(),
+          comment:   cells[7].innerText.trim()
+        };
       });
+    }
 
-      // Search and filter
-      const searchInput = document.getElementById('search-name');
-      const filterSelect = document.getElementById('filter-attendance');
-
-      function filterGrid() {
-        const searchValue = searchInput.value.toLowerCase();
-        const filterValue = filterSelect.value;
-
-        gridOptions.api.setQuickFilter(searchValue);
-
-        if (filterValue === 'all') {
-          gridOptions.api.setFilterModel(null);
-        } else {
-          gridOptions.api.setFilterModel({ attendance: { type: 'equals', filter: filterValue } });
-        }
-      }
-
-      searchInput.addEventListener('input', filterGrid);
-      filterSelect.addEventListener('change', filterGrid);
+    // Save all edits
+    btns.save.addEventListener('click', async () => {
+      syncFromTable();
+      await Promise.all(rsvps.map(r =>
+        fetch(`${API_BASE}/rsvp/${r._id}`, {
+          method:'PUT',
+          headers:{'Content-Type':'application/json'},
+          body:JSON.stringify(r)
+        })
+      ));
+      alert('Changes saved.');
+      load();
     });
+
+    // Delete single row
+    tbody.addEventListener('click', async e => {
+      if (e.target.classList.contains('delete-btn')) {
+        const id = e.target.dataset.id;
+        if (!confirm('Delete this RSVP?')) return;
+        await fetch(`${API_BASE}/rsvp/${id}`, { method:'DELETE' });
+        load();
+      }
+    });
+
+    // Delete selected
+    btns.deleteSel.addEventListener('click', async () => {
+      const ids = Array.from(tbody.querySelectorAll('.row-checkbox:checked'))
+                       .map(cb => cb.dataset.id);
+      if (!ids.length) return alert('No rows selected.');
+      if (!confirm(`Delete ${ids.length} rows?`)) return;
+      await Promise.all(ids.map(id =>
+        fetch(`${API_BASE}/rsvp/${id}`, { method:'DELETE' })
+      ));
+      load();
+    });
+
+    // Download CSV
+    btns.download.addEventListener('click', () => {
+      syncFromTable();
+      const header = ['First Name','Last Name','Attendance','Adults','Kids','Contact','Comment'];
+      const rows = rsvps.map(r => [
+        r.firstName, r.lastName, r.attendance,
+        r.adults, r.kids, r.contact, `"${r.comment.replace(/"/g,'""')}"`
+      ].join(','));
+      const csv = [header.join(','), ...rows].join('\n');
+      const blob = new Blob([csv], { type:'text/csv' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'rsvps.csv';
+      a.click();
+    });
+
+    // Search & filter
+    inputs.search.addEventListener('input', () => { renderTable(); });
+    inputs.filter.addEventListener('change', () => { renderTable(); });
+
+    // Select all
+    inputs.selectAll.addEventListener('change', e => {
+      tbody.querySelectorAll('.row-checkbox')
+           .forEach(cb => cb.checked = e.target.checked);
+    });
+
+    // Initial load
+    load();
+  })();
   </script>
 </body>
 </html>
