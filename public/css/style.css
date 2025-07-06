@@ -70,7 +70,7 @@ button {
   width: 50vw;    /* half the viewport width */
   height:100vh;   /* full viewport height */
   /* DOUBLE the image width, keep full height */
-  background-image: url('../pubilc/images/door-image.png');
+  background-image: url('https://github.com/GnandeepVenigalla/House-Warming-Ceremony/blob/main/public/images/door.png?raw=true');
   background-size: 200% 100%;
   background-repeat: no-repeat;
   transition: transform 1s ease-in-out;
@@ -95,7 +95,7 @@ button {
 .door-container.open .door-right { transform: rotateY( 90deg); }
 
 /* 6) Welcome title — fade out when `.open` */
-#welcome-title {
+.welcome-title {
   position: absolute;
   top:   40%;
   width: 100%;

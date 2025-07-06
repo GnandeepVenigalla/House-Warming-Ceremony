@@ -11,7 +11,7 @@
 
   <!-- DOOR OVERLAY -->
     <div class="door-container" id="door-container">
-    <div id="welcome-title">Welcome</div>
+    <div class="welcome-title">Welcome to<br/>Chagarlamudi's Home</div>
     <div class="door door-left"></div>
     <div class="door door-right"></div>
     <button id="key-btn">🔑</button>
@@ -31,7 +31,7 @@
       <div class="bg-rsvp-background bg-cover bg-center rounded-lg p-4 mt-3">
         <form id="rsvp-form" action="/rsvp" method="POST" class="p-4 mt-14">
           <h2 class="text-xl font-bold mb-4 text-center">RSVP</h2>
-          <div class="mb-3 text-center grid grid-cols-[auto_auto] gap-4 place-items-center">
+          <div class="mb-3 text-center flex  gap-4 place-items-center">
             <label class="font-semibold">Will you attend?</label>
             <label><input type="radio" name="attendance" value="yes" required /> Yes</label>
             <label><input type="radio" name="attendance" value="no"  required /> No</label>
@@ -45,7 +45,7 @@
                    placeholder="Number of Kids" class="w-full border p-2 mb-3 rounded" />
           </div>
           <input name="contact" type="tel" required placeholder="Contact Number"
-                 class="w-full border p-2 mb-3 rounded" />
+                 class="w-full border p-2 mb-3 rounded" pattern="\\d{10}" maxlength="10" title="Please enter exactly 10 digits" />
           <textarea name="comment" placeholder="Additional comments (optional)"
                     class="w-full border p-2 mb-3 rounded" rows="4"></textarea>
           <button type="submit"
