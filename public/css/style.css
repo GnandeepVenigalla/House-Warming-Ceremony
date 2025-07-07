@@ -70,7 +70,7 @@ button {
   width: 50vw;    /* half the viewport width */
   height:100vh;   /* full viewport height */
   /* DOUBLE the image width, keep full height */
-  background-image: url('https://i.pinimg.com/736x/22/7e/62/227e62de2eab22b5ea1014b98e0068b7.jpg');
+  background-image: url('https://github.com/GnandeepVenigalla/House-Warming-Ceremony/blob/main/public/images/maindoor.png?raw=true');
   background-size: 200% 100%;
   background-repeat: no-repeat;
   transition: transform 1s ease-in-out;
