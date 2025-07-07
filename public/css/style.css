@@ -70,7 +70,7 @@ button {
   width: 50vw;    /* half the viewport width */
   height:100vh;   /* full viewport height */
   /* DOUBLE the image width, keep full height */
-  background-image: url('https://github.com/GnandeepVenigalla/House-Warming-Ceremony/blob/main/public/images/door.png?raw=true');
+  background-image: url('https://i.pinimg.com/736x/22/7e/62/227e62de2eab22b5ea1014b98e0068b7.jpg');
   background-size: 200% 100%;
   background-repeat: no-repeat;
   transition: transform 1s ease-in-out;
@@ -97,12 +97,12 @@ button {
 /* 6) Welcome title — fade out when `.open` */
 .welcome-title {
   position: absolute;
-  top:   40%;
+  top:   60%;
   width: 100%;
   text-align: center;
   font-size: 1.5rem;
   font-weight: bold;
-  color: #b75f16;
+  color: #d9a943;
   z-index: 60;
   transition: opacity 0.5s ease;
 }

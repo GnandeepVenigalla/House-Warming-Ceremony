@@ -113,15 +113,14 @@ rsvpForm.addEventListener("submit", async (e) => {
 
 
 const container = document.getElementById('door-container');
-    const keyBtn    = document.getElementById('key-btn');
-    const main      = document.getElementById('main-content');
+const main      = document.getElementById('main-content');
 
-    keyBtn.addEventListener('click', () => {
-      container.classList.add('open');
-      // after doors finish swinging (1s), remove overlay and show main page
-      container.addEventListener('transitionend', () => {
-        container.remove();
-        main.classList.remove('opacity-0');
-        main.classList.add('opacity-100');
-      }, { once: true });
-    });
+container.addEventListener('click', () => {
+  container.classList.add('open');
+  // after doors finish swinging (1s), remove overlay and show main page
+  container.addEventListener('transitionend', () => {
+    container.remove();
+    main.classList.remove('opacity-0');
+    main.classList.add('opacity-100');
+  }, { once: true });
+});
