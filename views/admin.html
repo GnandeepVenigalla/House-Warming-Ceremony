@@ -104,7 +104,6 @@
       selectAll:document.getElementById('select-all')
     };
     const btns = {
-      save:   document.getElementById('save-btn'),
       deleteSel: document.getElementById('delete-selected-btn'),
       download:  document.getElementById('download-csv-btn')
     };
@@ -185,20 +184,6 @@
         };
       });
     }
-
-    // Save all edits
-    btns.save.addEventListener('click', async () => {
-      syncFromTable();
-      await Promise.all(rsvps.map(r =>
-        fetch(`${API_BASE}/rsvp/${r._id}`, {
-          method:'PUT',
-          headers:{'Content-Type':'application/json'},
-          body:JSON.stringify(r)
-        })
-      ));
-      alert('Changes saved.');
-      load();
-    });
 
     // Delete single row
     tbody.addEventListener('click', async e => {
