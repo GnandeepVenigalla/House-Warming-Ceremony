@@ -111,10 +111,25 @@
 
     // Fetch & render
     async function load() {
-      const resp = await fetch(`${API_BASE}/api/rsvps`);
-      rsvps = await resp.json();
-      renderTable();
-      updateStats();
+      try {
+        const resp = await fetch(`${API_BASE}/api/rsvps`);
+        if (!resp.ok) {
+          console.error('Failed to fetch RSVP data:', resp.status, resp.statusText);
+          tbody.innerHTML = '<tr><td colspan="9" class="text-center p-4">Failed to load RSVP data.</td></tr>';
+          return;
+        }
+        rsvps = await resp.json();
+        if (!Array.isArray(rsvps) || rsvps.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="9" class="text-center p-4">No RSVP data available.</td></tr>';
+          updateStats();
+          return;
+        }
+        renderTable();
+        updateStats();
+      } catch (error) {
+        console.error('Error fetching RSVP data:', error);
+        tbody.innerHTML = '<tr><td colspan="9" class="text-center p-4">Error loading RSVP data.</td></tr>';
+      }
     }
 
     // Render table rows
